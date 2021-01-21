@@ -1,0 +1,31 @@
+<meta charset="utf-8">
+  <script>
+
+let numero1 = parseInt(prompt("primeiro número"));
+let operação = prompt("Qual operação? Use estes simbolos (+ , - , * , /)")
+let numero2 = parseInt(prompt("segundo número"))
+
+
+function calculadora (valor, operador, valor2){
+
+switch (operador) {
+    case "+" : return (valor + valor2)
+break
+    case "-" : return (valor - valor2)
+break
+    case "*" : return (valor * valor2)
+break
+    case "/" : return (valor / valor2)
+break
+    default  : return ("Operador invalido")
+}
+}
+
+function calcular (numero1, operação, numero2) {
+return(`O resultado de ${numero1} ${operação} ${numero2} é igual a ${calculadora(numero1,operação,numero2).toString().replace(".",",")}`)}
+
+  document.write(calcular(numero1,operação,numero2)) 
+</script>
+
+
+
