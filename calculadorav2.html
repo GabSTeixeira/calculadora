@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<meta charset="UTF-8" />
+
+<head>
+    <title>Calculadora</title>
+    <style>
+        .botões>button {
+            width: 100px;
+            height: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="painel">
+        <p>resultado é </p>
+        <p id="resultado"></p>
+
+    </div>
+
+    <div class="botões">
+        <button id="7" onclick="digitar(this)">7</button>
+        <button id="8" onclick="digitar(this)">8</button>
+        <button id="9" onclick="digitar(this)">9</button>
+        <button id=" + " onclick="digitar(this)">+</button><br>
+        <button id="4" onclick="digitar(this)">4</button>
+        <button id="5" onclick="digitar(this)">5</button>
+        <button id="6" onclick="digitar(this)">6</button>
+        <button id=" - " onclick="digitar(this)">-</button> <br>
+        <button id="1" onclick="digitar(this)">1</button>
+        <button id="2" onclick="digitar(this)">2</button>
+        <button id="3" onclick="digitar(this)">3</button>
+        <button id=" * " onclick="digitar(this)">*</button><br>
+        <button id="0" onclick="digitar(this)">0</button>
+        <button id="." onclick="digitar(this)">,</button>
+        <button id=" / " onclick="digitar(this)">/</button>
+        <button id="resultado" onclick="resultado()">=</button>
+
+    </div>
+    <script>
+
+        let array = []
+
+        function digitar(obj) {
+            return array.push(obj.id)
+        }
+
+
+
+        function FormandoConta(array) {
+            let Unificando = array.reduce((total, atual) => {
+                return `${total}` + `${atual}`
+            })
+            let contaPronta = Unificando.split(' ')
+            return contaPronta
+        }
+
+
+        function removerVezesEDivisões(array) {
+            let newarray = []
+
+            array.map((e, index) => {
+                if (e == '*' || e == '/') {
+
+                    if (e == '*') {
+                        if (array[(index + 2)] == '*' || array[index + 2] == '/') {
+
+                            let conta = ((array[(index - 1)] * array[(index + 1)]))
+                            array[(index + 1)] = conta
+
+                        } else {
+
+                            let conta = newarray.push((array[(index - 1)] * array[(index + 1)]))
+                            return conta
+                        }
+                    }
+
+                    if (e == '/') {
+                        if (array[(index + 2)] == '*' || array[index + 2] == '/') {
+                            let conta = ((array[(index - 1)] / array[(index + 1)]))
+
+
+                            array[(index + 1)] = conta
+                        } else {
+
+                            let conta = newarray.push((array[(index - 1)] / array[(index + 1)]))
+                            return conta
+                        }
+                    }
+                } else {
+                    if (e == '+' || e == '-') {
+                        if ((index + 3) > array.length) {
+                            if (array[index - 2] == '+' || array[index - 2] == '-') {
+                                newarray.push(array[index - 1])
+                                newarray.push(e)
+                                newarray.push(array[index + 1])
+                            } else {
+
+                                newarray.push(e)
+                                newarray.push(array[(index + 1)])
+
+                            }
+                        } else {
+
+                            if (index == 1) {
+                                newarray.push(array[(index - 1)])
+                                newarray.push(e)
+                            }
+                            if (index < array.length - 1 && index > 1) {
+
+                                newarray.push(e)
+
+                            }
+
+                        }
+                    }
+                }
+            })
+
+            return newarray
+        }
+
+        function SomareSubtrair(array) {
+            let resposta = 0
+            array.map((e, index) => {
+                if (e == '-') {
+                    let conta = array[index - 1] - array[index + 1]
+                    array[index + 1] = conta
+                    if ((index + 3) > array.length) {
+                        return resposta = conta
+                    }
+                }
+                if (e == '+') {
+                    let conta = array[index - 1] + array[index + 1]
+                    array[index + 1] = conta
+                    if ((index + 3) > array.length) {
+                        return resposta = conta
+                    }
+                }
+            })
+            return resposta
+
+        }
+
+        function TrocarPontoporVirgula(number) {
+            if (number % 1 == 0) {
+                return number
+            }
+            else { return number.toString().replace('.', ',') }
+
+            return number
+        }
+
+
+        function calcular(ArraydeNumeros) {
+            let resultado = 0
+            let temVezesouDivisor = false
+            console.log(`passo 1`)
+            console.log(ArraydeNumeros)
+            let Unificando = FormandoConta(array)
+            console.log(`passo 2`)
+            console.log(Unificando)
+            let StringParaNumero = Unificando.map(e => {
+                if (e == '+' || e == '-' || e == '*' || e == '/') {
+                    return e
+                }
+                else {
+
+                    return parseFloat(e)
+                }
+            })
+            console.log(`passo 3`)
+            console.log(StringParaNumero)
+            StringParaNumero.map(e => { if (e == '*' || e == '/') { temVezesouDivisor = true } })
+            if (temVezesouDivisor) {
+                stringFeita = removerVezesEDivisões(StringParaNumero)
+                console.log(`passo 4`)
+                console.log(stringFeita)
+                if (stringFeita.length > 1) {
+                    resultado = SomareSubtrair(stringFeita)
+                }
+                else {
+                    resultado = stringFeita
+                }
+            } else {
+                resultado = SomareSubtrair(StringParaNumero)
+            }
+            return resultado
+        }
+
+
+
+
+        function resultado() {
+            if (array.length != 0) {
+
+                let painelResultado = document.getElementById('resultado')
+                let Calculo = calcular(array)
+                console.log(`passo 5`)
+                console.log(Calculo)
+                if (Calculo.toString() == 'NaN') {
+                    painelResultado.innerHTML = 'Conta Inválida'
+                }
+                else {
+                    painelResultado.innerHTML = TrocarPontoporVirgula(Calculo)
+                }
+                return array.splice(0[array.length])
+
+            }
+        }
+
+    </script>
+</body>
