@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Calculadora de Impostos</title>
+        <style>
+        * {
+            font-family: fantasy;
+        }
+
+        .calculadora {
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: 3fr 2fr 0.5fr 1.5fr;
+            margin: 5px 75px 10px 75px;
+            height: 80vh;
+            background-color: rgb(17, 17, 17);
+            border-radius: 3%;
+        }
+
+        .titulo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        h2,
+        label {
+            color: orangered;
+        }
+
+        .informaçoes {
+            display: grid;
+            grid-template-rows: 3fr 1fr 1fr;
+            text-align: center;
+        }
+
+        .informaçoes>h2 {
+            font-size: 3em;
+        }
+        
+        .informaçoes>.reais {
+            color: orange;
+        }
+
+        h2,
+        form[name="formulario"] {
+            display: flex;
+            justify-self: center;
+            justify-items: center;
+        }
+
+        button {
+            display: flex;
+            justify-self: center;
+            justify-content: center;
+            align-items: center;
+            width: 15em;
+            height: 5em;
+            background-color: orangered;
+            color: black;
+            font: inherit;
+            border-radius: 0.5em;
+            border: 0px;
+            cursor: pointer;
+            box-shadow: 1px 5px 0px 2px rgb(94, 25, 4);
+        }
+
+        button:active {
+            box-shadow: 0px 0px 0px 0px, inset 2px 5px 3px rgb(94, 25, 4);
+        }
+
+        .lucro {
+            margin: 0px;
+            color: orangered;
+            font-size: large;
+            text-align: center;
+        }
+
+        .exibirResp {
+            display: grid;
+            grid-template-rows: 0.5fr 1.5fr;
+            grid-gap: 1px 1px;
+        }
+
+        .listaRespTop {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            background-color: gray;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .listaRespTop>span {
+            text-align: center;
+            color: orange;
+            font-size: medium;
+            font-weight: bold;
+            font-family: sans-serif;
+        }
+
+        .listaRespBot {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            grid-template-rows: 1fr 1fr;
+            grid-template-areas:
+              "csll irpj pislr cofinslr pislp cofinslp"
+              "total total total total total total"
+            ; 
+            text-align: center;
+            background-color: papayawhip;
+        }
+
+        #csll {
+            grid-area: csll;
+        }
+
+        #irpj {
+            grid-area: irpj;
+        }
+
+        #pislr {
+            grid-area: pislr;
+        }
+
+        #cofinslr {
+            grid-area: cofinslr;
+        }
+
+        #pislp {
+            grid-area: pislp;
+        }
+
+        #cofinslp {
+            grid-area: cofinslp;
+        }
+        
+        #total {
+            grid-area: total;
+        }
+
+
+    </style>
+</head>
+
+<body>
+    <div class="titulo">
+        <h1>calculadora de imposto</h1>
+    </div>
+    <div class="calculadora">
+
+        <div class="informaçoes">
+            <h2>Valor</h2>
+            <div>
+                <label class="reais" for="reais">R$</label>
+                <input form="formulario" id="valorImposto" name="reais" type="text" class="valor"
+                    placeholder="Valor aqui...">
+            </div>
+            <form id="formulario" name="formulario" autocomplete="off">
+                <input type="radio" name="nome" value="lr">
+                <label for="">lucro real</label>
+                <input type="radio" name="nome" value="lp">
+                <label for="">lucro presumido</label>
+                <input type="radio" name="nome" value="lm">
+                <label for="">regime misto</label>
+            </form>
+        </div>
+        <button id="botão" form="formulario" type="submit">calcular</button>
+        <p class="lucro">Lucro</p>
+        <div class="exibirResp">
+            <div class="listaRespTop">
+                <span>csll</span>
+                <span>irpj</span>
+                <span>pis real</span>
+                <span>cofins real</span>
+                <span>pis presumido</span>
+                <span>cofins presumido</span>
+            </div>
+            <div class="listaRespBot">
+                <span id="csll">R$0,00</span>
+                <span id="irpj">R$0,00</span>
+                <span id="pislr">R$0,00</span>
+                <span id="cofinslr">R$0,00</span>
+                <span id="pislp">R$0,00</span>
+                <span id="cofinslp">R$0,00</span>
+               
+                <span id="total">R$0,00</span>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const totalFinal = document.getElementById("total") 
+        const LucroCsll = document.getElementById("csll")
+        const LucroIrpj = document.getElementById("irpj")
+        const pislucroReal = document.getElementById("pislr")
+        const cofinslucroReal = document.getElementById("cofinslr")
+        const pislucroPresumido = document.getElementById("pislp")
+        const cofinslucroPresumido = document.getElementById("cofinslp")
+        const formulario = document.getElementById("formulario")
+        const botão = document.getElementById("botão")
+        const valorImposto = document.getElementById("valorImposto")
+
+
+        function porcentagem(valor, porcentagem) {
+            return (valor / 100) * porcentagem
+        }
+
+        function checarImput(value) {
+            const arrayNumeros = value.split('')
+            let index = 1
+            let temLetras = false
+
+            arrayNumeros.map((e, i) => {
+                if (e == ',') {
+                    return index == i
+                }
+                if (isNaN(e)) {
+                    return temLetras = true
+                }
+            })
+
+            if (temLetras) return false
+            if (index == 1) return true
+            if (arrayNumeros[index] == arrayNumeros[arrayNumeros.length - 3]) { return true }
+            else { return false }
+        }
+
+        function calcular(valor, tributação) {
+            const porcentagemImposto = porcentagem(valor, 32)
+            const stringPnumero = parseFloat(valor)
+            const csll = porcentagem(porcentagemImposto, 15)
+            const irpj = porcentagem(porcentagemImposto, 9)
+            const pisreal = porcentagem(valor, 1.65)
+            const cofinsreal = porcentagem(valor, 7.60)
+            const pispresumido = porcentagem(valor, 0.65)
+            const cofinspresumido = porcentagem(valor, 3)
+            const total = stringPnumero - csll - irpj
+
+            LucroCsll.innerHTML = 'R$' + csll.toFixed(2).replace('.', ',')
+            LucroIrpj.innerHTML = 'R$' + irpj.toFixed(2).replace('.', ',')
+
+            if (tributação == 'lr') {
+
+                pislucroReal.innerHTML = 'R$' + pisreal.toFixed(2).replace('.', ',')
+                cofinslucroReal.innerHTML = 'R$' + cofinsreal.toFixed(2).replace('.', ',')
+                pislucroPresumido.innerHTML = 'R$0,00'
+                cofinslucroPresumido.innerHTML = 'R$0,00'
+                totalFinal.innerHTML = 'R$' + (total - pisreal - cofinsreal).toFixed(2).replace('.',',')
+            }
+            if (tributação == 'lp') {
+
+                pislucroPresumido.innerHTML = 'R$' + pispresumido.toFixed(2).replace('.', ',')
+                cofinslucroPresumido.innerHTML = 'R$' + cofinspresumido.toFixed(2).replace('.', ',')
+                pislucroReal.innerHTML = 'R$0,00'
+                cofinslucroReal.innerHTML = 'R$0,00'
+                totalFinal.innerHTML = 'R$' + (total - pispresumido - cofinspresumido).toFixed(2).replace('.',',')
+            }
+            if (tributação == 'lm') {
+
+                pislucroReal.innerHTML = 'R$' + pisreal.toFixed(2).replace('.', ',')
+                cofinslucroReal.innerHTML = 'R$' + cofinsreal.toFixed(2).replace('.', ',')
+                pislucroPresumido.innerHTML = 'R$' + pispresumido.toFixed(2).replace('.', ',')
+                cofinslucroPresumido.innerHTML = 'R$' + cofinspresumido.toFixed(2).replace('.', ',')
+                totalFinal.innerHTML = 'R$' + ( total - pisreal - cofinsreal - pispresumido - cofinspresumido).toFixed(2).replace('.',',')
+
+            }
+        }
+
+        function Limpar() {
+
+            LucroCsll.innerHTML = ''
+            LucroIrpj.innerHTML = ''
+            pislucroReal.innerHTML = ''
+            cofinslucroReal.innerHTML = ''
+            pislucroPresumido.innerHTML = ''
+            cofinslucroPresumido.innerHTML = ''
+
+        }
+
+        botão.addEventListener('click', (event) => {
+            event.preventDefault()
+            Limpar()
+            if (checarImput(valorImposto.value)) {
+                return calcular((valorImposto.value).replace(',', '.'), formulario.nome.value)
+            } else {
+                alert('por favor insira um valor valido')
+            }
+
+        })
+    </script>
+</body>
+
+</html>
