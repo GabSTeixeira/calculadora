@@ -8,14 +8,14 @@
             width: 100px;
             height: 100px;
         }
+        
     </style>
 </head>
 
 <body>
     <div class="painel">
-        <p>resultado é </p>
-        <p id="resultado"></p>
-
+        <p>resultado de <span id="conta"></span> é: <span id="resultado"></span></p>
+        
     </div>
 
     <div class="botões">
@@ -35,17 +35,18 @@
         <button id="." onclick="digitar(this)">,</button>
         <button id=" / " onclick="digitar(this)">/</button>
         <button id="resultado" onclick="resultado()">=</button>
-
+        
     </div>
     <script>
-
+        
         let array = []
-
+        let arrayParaMostrar = document.getElementById('conta')
+        
         function digitar(obj) {
             return array.push(obj.id)
         }
-
-
+        
+        arrayParaMostrar.innerHTML = array
 
         function FormandoConta(array) {
             let Unificando = array.reduce((total, atual) => {
@@ -165,12 +166,13 @@
                     return e
                 }
                 else {
-
+                    
                     return parseFloat(e)
                 }
             })
             console.log(`passo 3`)
             console.log(StringParaNumero)
+            arrayParaMostrar.innerHTML = StringParaNumero
             StringParaNumero.map(e => { if (e == '*' || e == '/') { temVezesouDivisor = true } })
             if (temVezesouDivisor) {
                 stringFeita = removerVezesEDivisões(StringParaNumero)
@@ -187,13 +189,13 @@
             }
             return resultado
         }
+        
 
-
-
-
+        
+        
         function resultado() {
             if (array.length != 0) {
-
+                
                 let painelResultado = document.getElementById('resultado')
                 let Calculo = calcular(array)
                 console.log(`passo 5`)
@@ -205,7 +207,7 @@
                     painelResultado.innerHTML = TrocarPontoporVirgula(Calculo)
                 }
                 return array.splice(0[array.length])
-
+                
             }
         }
 
